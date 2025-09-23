@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace CBS.Service.Utilities
+namespace Sample.Service.Utilities
 {
     public class SwaggerEndpointFilter : IDocumentFilter
     {

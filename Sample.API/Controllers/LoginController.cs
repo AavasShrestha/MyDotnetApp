@@ -1,14 +1,14 @@
 ﻿using Azure;
-using CBS.Data.DTO;
-using CBS.Data.RoutingDB;
-using CBS.Service;
-using CBS.Service.Service;
+using Sample.Data.DTO;
+using Sample.Data.RoutingDB;
+using Sample.Service;
+using Sample.Service.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace CBS.API.Controllers
+namespace Sample.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -24,15 +24,15 @@ namespace CBS.API.Controllers
         }
 
         [HttpPost("userauthentication")]
-        public async Task<IActionResult> UserLogin([FromHeader(Name = "Tenant-ID")] int tenantId, [FromBody] LoginDTO login)
+        public async Task<IActionResult> UserLogin([FromBody] LoginDTO login)
         {
             try
             {
-                var response = _loginService.GetLoggedInUserDetail(login.UserName, login.Password, tenantId);
+                var response = _loginService.GetLoggedInUserDetail(login.UserName, login.Password);
 
                 if (response.isLoginSuccess == true)
                 {
-                    var token = _authService.GenerateJwtToken(tenantId, response.userDetail.Id);
+                    var token = _authService.GenerateJwtToken(response.userDetail.Id);
                     return new OkObjectResult(new
                     {
                         UserDetail = response.userDetail,

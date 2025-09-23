@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Data.DTO
+namespace Sample.Data.DTO
 {
     public class PaginatedResult<T>
     {

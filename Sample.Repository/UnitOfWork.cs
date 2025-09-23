@@ -1,37 +1,37 @@
-﻿using CBS.Data.RoutingDB;
-using CBS.Data.TenantDB;
+﻿using Sample.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Sample.Data.TenantDB;
 using System.Data;
 using System.Data.Common;
+using Sample.Data.RoutingDB;
 
-namespace CBS.Repository
+namespace Sample.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private TenantDbContext _dbContext;
-        private IRepository<Tenant> _tenantRepository;
-        private IRepository<User> _userRepository;
-        private IRepository<Client> _clientRepository;
-        private IRepository<Document> _documentRepository;
+        private readonly RoutingDbContext _dbContext;
+        private Repository<User> _userRepository;
+        private Repository<tblClientDetails> _clientDetailsRepository;
+        private Repository<Logo> _logoRepository;
+        private Repository<RegisterDb> _registerDbRepository;
 
-        public UnitOfWork(TenantDbContext dbContext)
+        public RoutingDbContext DbContext => _dbContext; // <-- expose it
+        public UnitOfWork(RoutingDbContext dbContext)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException("Context was not supplied");
         }
 
-        public IRepository<Tenant> TenantRepository =>
-           _tenantRepository ?? (_tenantRepository = new Repository<Tenant>(_dbContext));
-
         public IRepository<User> UserRepository =>
-            _userRepository ?? (_userRepository = new Repository<User>(_dbContext));
-        public IRepository<Client> ClientRepository =>
-            _clientRepository ?? (_clientRepository = new Repository<Client>(_dbContext));
+           _userRepository ?? (_userRepository = new Repository<User>(_dbContext));
 
-        public IRepository<Document> DocumentRepository =>
-            _documentRepository ?? (_documentRepository = new Repository<Document>(_dbContext));
+        public IRepository<tblClientDetails> ClientDetailsRepository =>
+            _clientDetailsRepository ?? (_clientDetailsRepository = new Repository<tblClientDetails>(_dbContext));
 
+        public IRepository<Logo> LogoRepository =>
+            _logoRepository ?? (_logoRepository = new Repository<Logo>(_dbContext));
+
+        public IRepository<RegisterDb> RegisterDbRepository =>
+            _registerDbRepository ?? (_registerDbRepository = new Repository<RegisterDb>(_dbContext));
 
         public bool Commit()
         {
@@ -50,7 +50,7 @@ namespace CBS.Repository
             }
         }
 
-        private int SaveChanges(TenantDbContext _dbContext)
+        private int SaveChanges(RoutingDbContext _dbContext)
         {
             return _dbContext.SaveChanges();
         }

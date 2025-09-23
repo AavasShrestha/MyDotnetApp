@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CBS.Service.Utilities
+namespace Sample.Service.Utilities
 {
     public static class SessionExtensions
     {

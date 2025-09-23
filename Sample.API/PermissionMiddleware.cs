@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace CBS.Service
+namespace Sample.Service
 {
     public class PermissionMiddleware
     {

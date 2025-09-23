@@ -1,6 +1,6 @@
-﻿using CBS.Data.DTO;
-using CBS.Repository;
-using CBS.Service.Cache;
+﻿using Sample.Data.DTO;
+using Sample.Repository;
+using Sample.Service.Cache;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Service
+namespace Sample.Service
 {
     public interface IPermissionService
     {

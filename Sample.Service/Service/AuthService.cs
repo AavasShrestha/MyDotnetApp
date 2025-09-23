@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Service
+namespace Sample.Service
 {
     public class AuthService
     {
@@ -20,7 +20,7 @@ namespace CBS.Service
             _configuration = configuration;
         }
 
-        public string GenerateJwtToken(int tenantId, int userId)
+        public string GenerateJwtToken(int userId)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
@@ -28,7 +28,6 @@ namespace CBS.Service
             var sessionId = Guid.NewGuid().ToString();
             var claims = new[]
             {
-            new Claim("tenantId", tenantId.ToString()),
             new Claim("userId", userId.ToString()),
             new Claim("sessionId", sessionId)
             };

@@ -1,17 +1,15 @@
-﻿using CBS.Data.RoutingDB;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Sample.Data.RoutingDB;
 
-namespace CBS.Data
+namespace Sample.Data
 {
     public class RoutingDbContext : DbContext
     {
-        public virtual DbSet<Tenant> Tenant { get; set; }
-        public virtual DbSet<tblClientDetails> tblClientDetails { get; set; }
+
+        public DbSet<tblClientDetails> tblClientDetails { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Logo> Logo { get; set; }
+        public DbSet<RegisterDb> RegisterDb { get; set; }
 
         public RoutingDbContext(DbContextOptions<RoutingDbContext> options) : base(options)
         {

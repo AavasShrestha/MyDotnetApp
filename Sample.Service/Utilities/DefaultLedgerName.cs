@@ -12,7 +12,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Service.Utilities
+namespace Sample.Service.Utilities
 {
     public static class DefaultData
     {

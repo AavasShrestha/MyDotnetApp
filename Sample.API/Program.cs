@@ -1,9 +1,9 @@
-using CBS.API;
-using CBS.Data;
-using CBS.Repository;
-using CBS.Service;
-using CBS.Service.Cache;
-using CBS.Service.Service;
+using Sample.API;
+using Sample.Data;
+using Sample.Repository;
+using Sample.Service;
+using Sample.Service.Cache;
+using Sample.Service.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Text;
 
-namespace CBS
+namespace Sample
 {
     public class Program
     {

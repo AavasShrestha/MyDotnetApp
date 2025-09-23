@@ -1,15 +1,15 @@
-﻿using CBS.Data;
+﻿using Sample.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace CBS.Repository
+namespace Sample.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly TenantDbContext _context;
+        private readonly RoutingDbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public Repository(TenantDbContext context)
+        public Repository(RoutingDbContext context)
         {
             _context = context ?? throw new ArgumentNullException("Context was not supplied"); ;
             _dbSet = context.Set<T>();

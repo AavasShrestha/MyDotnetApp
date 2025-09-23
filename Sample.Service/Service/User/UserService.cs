@@ -1,8 +1,8 @@
-﻿using CBS.Data.DTO;
-using CBS.Data.TenantDB;
-using CBS.Repository;
+﻿using Sample.Data.DTO;
+using Sample.Repository;
+using Sample.Data.RoutingDB;
 
-namespace CBS.Service
+namespace Sample.Service
 {
     public class UserService : IUserService
     {
@@ -14,59 +14,164 @@ namespace CBS.Service
         }
     
         // New CRUD methods
-        public UserDetail CreateUser(int userId, UserDetail userDetail)
+        public ValidationDTO CreateUser(int userId, UserDetail userDetail)
         {
-            var userEntity = new User
+            var response = new ValidationDTO();
+            try
             {
-                Username = userDetail.Username,
-                Password = userDetail.Password,
-                ConfirmPassword = userDetail.ConfirmPassword,
-                CreatedBy = userId,
-                CreatedDate = DateTime.Now,
-                Remarks = userDetail.Remarks,
-                Phone = userDetail.Phone,
-                FullName = userDetail.FullName,
-                IsActive = userDetail.IsActive,
-                Branchid = userDetail.Branchid
-            };
+                if (userDetail == null)
+                {
+                    response.Message = "Client data cannot be null.";
+                    return response;
+                }
 
-            _unitOfWork.UserRepository.Add(userEntity);
-            _unitOfWork.Commit();
+                var userName = (userDetail.Username ?? string.Empty).Trim();
+                var password = (userDetail.Password ?? string.Empty).Trim();
+                var ConfirmPassword = (userDetail.ConfirmPassword ?? string.Empty).Trim();
+                var Remarks = (userDetail.ConfirmPassword ?? string.Empty).Trim();
+                var Phone = (userDetail.Remarks ?? string.Empty).Trim();
+                var FullName = (userDetail.FullName ?? string.Empty).Trim();
+                var isActive = (userDetail.IsActive);
+                var Email = (userDetail.Email ?? string.Empty).Trim();
+                var Gender = (userDetail.Gender ?? string.Empty).Trim();
 
-            userDetail.Id = userEntity.Id;
-            return userDetail;
+                if (string.IsNullOrWhiteSpace(userName))
+                {
+                    response.Message = "User name cannot be null or empty.";
+                    return response;
+                }
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    response.Message = "Password name cannot be null or empty.";
+                    return response;
+                }
+
+                var exists = _unitOfWork.UserRepository.GetQuerable
+                    (u => u.Username == userName ).Any();
+
+                if (exists)
+                {
+                    response.Message = "User with the same name already exists.";
+                    return response;
+                }
+
+                var entity = new User
+                {
+                    Username = userName,
+                    Password = password,
+                    ConfirmPassword = ConfirmPassword,
+                    Remarks = Remarks,
+                    Phone = Phone,
+                    FullName = FullName,
+                    IsActive = isActive,
+                    Email = Email,
+                    Gender = Gender
+                };
+
+                _unitOfWork.UserRepository.Add(entity);
+                _unitOfWork.Commit();
+
+                response.IsSuccess = true;
+                response.Message = "User created successfully.";
+            }
+            catch(Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = $"An error occurred while creating the user: {ex.Message}";
+            }
+
+            return response;
         }
 
-        public UserDetail UpdateUser(int id, UserDetail userDetail)
+        public ValidationDTO UpdateUser(int id, UserDetail userDetail)
         {
-            var existingUser = _unitOfWork.UserRepository.GetQuerable(u => u.Id == id).FirstOrDefault();
-            if (existingUser == null)
-                return null;
+            var response = new ValidationDTO();
+            try
+            {
+                if (userDetail == null)
+                {
+                    response.Message = "User data cannot be null.";
+                    return response;
+                }
 
-            existingUser.Username = userDetail.Username;
-            if (!string.IsNullOrEmpty(userDetail.Password))
-                existingUser.Password = userDetail.Password;
-            existingUser.FullName = userDetail.FullName;
-            existingUser.IsActive = userDetail.IsActive;
-            existingUser.Branchid = userDetail.Branchid;
+                if (id <= 0)
+                {
+                    response.Message = "Invalid User id.";
+                    return response;
+                }
 
-            _unitOfWork.UserRepository.Update(existingUser);
-            _unitOfWork.Commit();
+                // Find existing User from database
+                var entity = _unitOfWork.UserRepository
+                    .GetQuerable(u => u.Id == id)
+                    .FirstOrDefault();
 
-            userDetail.Id = existingUser.Id;
-            return userDetail;
+                if (entity == null)
+                {
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                //  Update only allowed fields
+                entity.Username = (userDetail.Username ?? string.Empty).Trim();
+                entity.Password = (userDetail.Password ?? string.Empty).Trim();
+                entity.ConfirmPassword = (userDetail.ConfirmPassword ?? string.Empty).Trim();
+                entity.Remarks = (userDetail.Remarks ?? string.Empty).Trim();
+                entity.Phone = (userDetail.Phone ?? string.Empty).Trim();
+                entity.FullName = (userDetail.FullName ?? string.Empty).Trim();
+                entity.IsActive = (userDetail.IsActive);
+                entity.Gender = (userDetail.Gender ?? string.Empty).Trim();
+
+
+                _unitOfWork.UserRepository.Update(entity);
+                _unitOfWork.Commit();
+
+                response.IsSuccess = true;
+                response.Message = "User updated successfully.";
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = "An error occurred while updating the client. Please try again!";
+            }
+
+
+            return response;
         }
 
-        public bool DeleteUser(int id)
+        public ValidationDTO DeleteUser(int id)
         {
-            var existingUser = _unitOfWork.UserRepository.GetQuerable(u => u.Id == id).FirstOrDefault();
-            if (existingUser == null)
-                return false;
+            var response = new ValidationDTO();
 
-            _unitOfWork.UserRepository.Delete(existingUser);
-            _unitOfWork.Commit();
+            try
+            {
+                if (id <= 0)
+                    throw new ArgumentException("Invalid User id.");
 
-            return true;
+                //  Find existing client
+                var entity = _unitOfWork.UserRepository
+                    .GetQuerable(u => u.Id == id)
+                    .FirstOrDefault();
+
+                if (entity == null)
+                    throw new KeyNotFoundException("User not found.");
+
+                //  Delete the client
+                _unitOfWork.UserRepository.Delete(entity);
+                _unitOfWork.Commit();
+
+                response.IsSuccess = true;
+                response.Message = "User deleted successfully.";
+            }
+
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "An error occurred while deleting the user. Please try again!";
+            }
+
+            return response;
+
         }
 
 
@@ -77,9 +182,14 @@ namespace CBS.Service
                 {
                     Id = u.Id,
                     Username = u.Username,
+                    Password = u.Password,
+                    ConfirmPassword = u.ConfirmPassword,
+                    Remarks = u.Remarks,
+                    Phone = u.Phone,
                     FullName = u.FullName,
                     IsActive = u.IsActive,
-                    Branchid = u.Branchid
+                    Email = u.Email,
+                    Gender = u.Gender
                 }).ToList();
         }
 
@@ -96,8 +206,13 @@ namespace CBS.Service
                 Id = user.Id,
                 Username = user.Username,
                 FullName = user.FullName,
+                Password = user.Password,
+                ConfirmPassword = user.ConfirmPassword,
+                Remarks = user.Remarks,
+                Phone = user.Phone,
                 IsActive = user.IsActive,
-                Branchid = user.Branchid
+                Email = user.Email,
+                Gender = user.Gender
             };
         }
 
@@ -111,8 +226,6 @@ namespace CBS.Service
                     {
                         Id = u.Id,
                         IsActive = u.IsActive,
-                        //Address = u.Address,
-                        Branchid = u.Branchid,
                         Username = u.Username,
                         FullName = u.FullName
                     }).FirstOrDefault();
@@ -127,6 +240,65 @@ namespace CBS.Service
         }
 
 
+        public UserDetail PatchUser(int id, Dictionary<string, object> patchData)
+        {
+            var entity = _unitOfWork.UserRepository.GetQuerable(u => u.Id == id).FirstOrDefault();
+            if (entity == null)
+                throw new KeyNotFoundException("User not found.");
+
+            foreach (var key in patchData.Keys)
+            {
+                switch (key.ToLower())
+                {
+                    case "username":
+                        entity.Username = patchData[key]?.ToString();
+                        break;
+                    case "password":
+                        entity.Password = patchData[key]?.ToString();
+                        break;
+                    case "confirmpassword":
+                        entity.ConfirmPassword = patchData[key]?.ToString();
+                        break;
+                    case "fullname":
+                        entity.FullName = patchData[key]?.ToString();
+                        break;
+                    case "email":
+                        entity.Email = patchData[key]?.ToString();
+                        break;
+                    case "phone":
+                        entity.Phone = patchData[key]?.ToString();
+                        break;
+                    case "gender":
+                        entity.Gender = patchData[key]?.ToString();
+                        break;
+                    case "remarks":
+                        entity.Remarks = patchData[key]?.ToString();
+                        break;
+                    case "isactive":
+                        entity.IsActive = Convert.ToBoolean(patchData[key]);
+                        break;
+                }
+            }
+
+            entity.ModifiedDate = DateTime.Now;
+
+            _unitOfWork.UserRepository.Update(entity);
+            _unitOfWork.Commit();
+
+            return new UserDetail
+            {
+                Id = entity.Id,
+                Username = entity.Username,
+                Password = entity.Password,
+                ConfirmPassword = entity.ConfirmPassword,
+                FullName = entity.FullName,
+                Email = entity.Email,
+                Phone = entity.Phone,
+                Gender = entity.Gender,
+                Remarks = entity.Remarks,
+                IsActive = entity.IsActive
+            };
+        }
 
 
     }

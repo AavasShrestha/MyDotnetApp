@@ -1,11 +1,11 @@
-﻿using CBS.Data.DTO;
+﻿using Sample.Data.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Service
+namespace Sample.Service
 {
     public interface IUserService
     {
@@ -15,10 +15,12 @@ namespace CBS.Service
 
 
         // New CRUD methods:
-        UserDetail CreateUser(int userId, UserDetail userDetail);
-        UserDetail UpdateUser(int id, UserDetail userDetail);
-        bool DeleteUser(int id);
+        ValidationDTO CreateUser(int userId, UserDetail userDetail);
+        ValidationDTO UpdateUser(int id, UserDetail userDetail);
+        ValidationDTO DeleteUser(int id);
         IEnumerable<UserDetail> GetAllUsers();
         UserDetail GetUserById(int id);
+
+        UserDetail PatchUser(int id, Dictionary<string, object> patchData);
     }
 }

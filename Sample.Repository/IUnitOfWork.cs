@@ -1,17 +1,19 @@
-﻿using CBS.Data.RoutingDB;
-using CBS.Data.TenantDB;
+﻿
 using Microsoft.Data.SqlClient;
-using Sample.Data.TenantDB;
 using System.Data.Common;
+using Sample.Data.RoutingDB;
+using Sample.Data;
 
-namespace CBS.Repository
+namespace Sample.Repository
 {
     public interface IUnitOfWork
     {
-        IRepository<Tenant> TenantRepository { get; }
         IRepository<User> UserRepository { get; }
-        IRepository<Client> ClientRepository { get; }
-        IRepository<Document> DocumentRepository { get; }
+        IRepository<tblClientDetails> ClientDetailsRepository { get; }
+        IRepository<Logo> LogoRepository { get; }
+        RoutingDbContext DbContext { get; }
+        IRepository<RegisterDb> RegisterDbRepository { get; }
+
         bool Commit();
 
         List<T> ExecuteStoredProcedure<T>(string storedProcedure, Func<DbDataReader, T> map, params SqlParameter[] parameters);

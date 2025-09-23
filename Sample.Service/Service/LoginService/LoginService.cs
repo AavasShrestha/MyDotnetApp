@@ -1,9 +1,9 @@
-﻿using CBS.Data.DTO;
-using CBS.Repository;
-using CBS.Service.Cache;
+﻿using Sample.Data.DTO;
+using Sample.Repository;
+using Sample.Service.Cache;
 using SWCommon.Static;
 
-namespace CBS.Service.Service
+namespace Sample.Service.Service
 {
     public class LoginService : ILoginService
     {
@@ -18,7 +18,7 @@ namespace CBS.Service.Service
             _userService = userService;
         }
 
-        public (bool isLoginSuccess, UserDetail userDetail) GetLoggedInUserDetail(string userName, string password, int company)
+        public (bool isLoginSuccess, UserDetail userDetail) GetLoggedInUserDetail(string userName, string password)
         {
             var encryptedPassword = StringEncryption.Encrypt(password);
             var data = _userService.GetLoggedInUserDetail(userName, encryptedPassword);

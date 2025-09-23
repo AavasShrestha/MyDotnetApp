@@ -1,11 +1,11 @@
-﻿using CBS.Data.DTO;
+﻿using Sample.Data.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CBS.Service.Utilities
+namespace Sample.Service.Utilities
 {
     public static class Pagination
     {

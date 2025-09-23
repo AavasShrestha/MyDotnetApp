@@ -1,9 +1,7 @@
-﻿using CBS.Data.DTO;
-using CBS.Data.TenantDB;
-using CBS.Service;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Sample.Data.DTO;
+using Sample.Service;
 using Microsoft.AspNetCore.Mvc;
+using Azure;
 
 namespace Sample.API.Controllers
 {
@@ -24,11 +22,14 @@ namespace Sample.API.Controllers
             [FromHeader(Name = "User-ID")] int userId,
             [FromBody] UserDetail userDetail)
         {
-            if (userDetail == null)
-                return BadRequest("Invalid user data.");
+            //if (userDetail == null)
+            //    return BadRequest("Invalid user data.");
 
-            var createdUser = _userService.CreateUser(userId, userDetail);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+            //var createdUser = _userService.CreateUser(userId, userDetail);
+            //return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+
+            var result = _userService.CreateUser(userId, userDetail);
+            return Ok(result);
         }
 
         // PUT: api/user/{id}
@@ -49,11 +50,11 @@ namespace Sample.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
-            var result = _userService.DeleteUser(id);
-            if (!result)
-                return NotFound($"User with ID {id} not found.");
-
-            return NoContent();
+            var response = _userService.DeleteUser(id);
+            if (response.IsSuccess)
+                return Ok(response);
+            else
+                return BadRequest(response.Message);
         }
 
         // GET: api/user
@@ -73,6 +74,17 @@ namespace Sample.API.Controllers
                 return NotFound($"User with ID {id} not found.");
 
             return Ok(user);
+        }
+
+        // PATCH: api/user/{id}
+        [HttpPatch("{id}")]
+        public IActionResult PatchUser(int id, [FromBody] Dictionary<string, object> patchData)
+        {
+            if (patchData == null || !patchData.Any())
+                return BadRequest("Patch data cannot be empty.");
+
+            var updatedUser = _userService.PatchUser(id, patchData);
+            return Ok(updatedUser);
         }
 
         //// POST: api/user/login

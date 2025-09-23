@@ -1,18 +1,19 @@
-﻿using CBS.Data;
-using CBS.Repository;
-using CBS.Service;
-using CBS.Service.Cache;
-using CBS.Service.Service;
+﻿using Sample.Data;
+using Sample.Repository;
+using Sample.Service;
+using Sample.Service.Cache;
+using Sample.Service.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Sample.Service.Service.Client;
-using Sample.Service.Service.Document;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-
-namespace CBS.API
+using Sample.Service.Database;
+using Sample.Service.Service.Client;
+using Sample.Service.Service.LogoService;
+using Sample.Service.Service.RegisterDbService;
+namespace Sample.API
 {
     public class Startup
     {
@@ -29,19 +30,7 @@ namespace CBS.API
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddEntityFrameworkSqlServer().AddDbContextPool<RoutingDbContext>(b => b.UseSqlServer(connectionString));
 
-            services.AddScoped<TenantDbContext>(provider =>
-            {
-                var httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var connectionString = httpContext?.Items["TenantConnectionString"]?.ToString();
-
-                if (string.IsNullOrEmpty(connectionString))
-                    throw new InvalidOperationException("Tenant connection string not found.");
-
-                var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
-                optionsBuilder.UseSqlServer(connectionString);
-
-                return new TenantDbContext(optionsBuilder.Options);
-            });
+            
 
             services.AddHttpContextAccessor();
             services.AddMvc(setupAction =>
@@ -58,9 +47,9 @@ namespace CBS.API
                 {
                     builder.WithOrigins(
                         "http://localhost:5173",
+                        "https://localhost:5173",
                         "http://localhost:5174",
-                        "https://iconsoft-dashboard.netlify.app",
-                        "https://iconsoft-dashboard11.netlify.app") // Include the production URL
+                        "http://localhost:5175") // Include the production URL
                            .AllowAnyMethod() // Allow all HTTP methods
                            .AllowAnyHeader() // Allow all headers
                            .AllowCredentials(); // Required if using cookies or Authorization headers
@@ -144,11 +133,10 @@ namespace CBS.API
                         {
                             var token = authHeader.Substring("Bearer ".Length).Trim();
                             var decodeToken = new JwtSecurityToken(jwtEncodedString: token);
-                            string tenantId = decodeToken.Claims.First(c => c.Type == "tenantId").Value;
                             string userId = decodeToken.Claims.First(c => c.Type == "userId").Value;
                             string sessionId = decodeToken.Claims.First(c => c.Type == "sessionId").Value;
 
-                            context.Request.Headers["Tenant-ID"] = tenantId;
+                            
                             context.Request.Headers["User-ID"] = userId;
                             context.Request.Headers["Session-ID"] = sessionId;
                         }
@@ -208,7 +196,7 @@ namespace CBS.API
             app.UseAuthorization();
             app.UseSession();
 
-            app.UseMiddleware<TenantMiddleware>();
+            //app.UseMiddleware<>();
 
             app.UseMiddleware<PermissionMiddleware>();
             app.Use(async (context, next) =>
@@ -241,8 +229,10 @@ namespace CBS.API
             services.AddScoped<AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPermissionService, PermissionService>();
-            services.AddScoped<IClientService, ClientService>();
-            services.AddScoped<IDocumentService, DocumentService>();
+            services.AddScoped<IClientDetailService, ClientDetailService>();
+            services.AddScoped<IDatabaseService, DatabaseService>();
+            services.AddScoped<ILogoService, LogoService>();
+            services.AddScoped<IRegisterDbService, RegisterDbService>();
             #endregion DependencyInjection
         }
     }
