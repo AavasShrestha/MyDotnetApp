@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sample.Data.DTO;
+using Sample.Data.RoutingDB;
 using Sample.Service.Service.Client;
 
 namespace Sample.API.Controllers
@@ -12,11 +13,32 @@ namespace Sample.API.Controllers
     public class ClientDetailController : ControllerBase
     {
         private readonly IClientDetailService _service;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWebHostEnvironment _env;
 
-        public ClientDetailController(IClientDetailService service)
+        public ClientDetailController(IClientDetailService service, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment env)
         {
             _service = service;
+            _httpContextAccessor = httpContextAccessor;
+            _env = env;
         }
+
+
+
+        //[HttpGet("view-logo/{id}")]
+        //public IActionResult ViewLogo(int id)
+        //{
+        //    var client = _service.GetClientById(id);
+        //    if (client == null || string.IsNullOrEmpty(client.Logo))
+        //        return NotFound();
+
+        //    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", client.Logo.Replace("/", "\\"));
+        //    if (!System.IO.File.Exists(filePath))
+        //        return NotFound();
+
+        //    var mimeType = "image/" + Path.GetExtension(filePath).TrimStart('.');
+        //    return PhysicalFile(filePath, mimeType);
+        //}
 
 
 
@@ -70,6 +92,7 @@ namespace Sample.API.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateClient([FromHeader(Name = "User-ID")] int userID, int id, [FromForm] ClientDetailDto clientDetailDto)
         {
+
             if (clientDetailDto == null)
                 return BadRequest("Client data cannot be null.");
 
@@ -113,22 +136,55 @@ namespace Sample.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteClient(int id)
         {
-            try
+            var result = _service.DeleteClient(id);
+            if (result.IsSuccess)
             {
-                var result = _service.DeleteClient(id);
-
-                if (!result.IsSuccess)
-                    return NotFound($"Client with ID {id} not found.");
-
                 return Ok(result);
             }
-            catch (Exception ex)
+
+            else
             {
-                return StatusCode(500, "An unexpected error occurred.");
+                if (result.Message.Contains("Not found"))
+                    return NotFound(result);
+
+                return BadRequest(result);
             }
         }
 
+        
+
+        [HttpGet("image/{id}/{fileName}")]
+        public IActionResult GetImage(int id, string fileName)
+        {
+            // Dynamically get path from wwwroot/ uploads / logos
+            var basePath = Path.Combine(_env.WebRootPath, "uploads", "logos");
+
+            var tenantDB = _service.GetClientById(id).db_name;
 
 
+            // Build the actual file path
+            string actualFileName = fileName; // "8973p.jpg"
+            string folder = tenantDB;       // or dynamic if needed
+            string filePath = Path.Combine(
+               basePath,
+                folder,
+                actualFileName
+            );
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Image not found.");
+
+            string ext = Path.GetExtension(filePath).ToLowerInvariant();
+            string contentType = ext switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+
+            byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(imageBytes, contentType);
+        }
     }
 }

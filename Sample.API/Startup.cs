@@ -13,6 +13,8 @@ using Sample.Service.Database;
 using Sample.Service.Service.Client;
 using Sample.Service.Service.LogoService;
 using Sample.Service.Service.RegisterDbService;
+using Sample.Service.Service.BranchService;
+using Sample.Data.RoutingDB;
 namespace Sample.API
 {
     public class Startup
@@ -195,6 +197,8 @@ namespace Sample.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseSession();
+            app.UseStaticFiles(); // allows wwwroot to be served publicly
+
 
             //app.UseMiddleware<>();
 
@@ -233,6 +237,10 @@ namespace Sample.API
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<ILogoService, LogoService>();
             services.AddScoped<IRegisterDbService, RegisterDbService>();
+            services.AddScoped<IBranchService, BranchService>();
+            // tbl_user and tbl_branch
+            //services.AddScoped<IBranchService, BranchService>();
+            //services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
             #endregion DependencyInjection
         }
     }

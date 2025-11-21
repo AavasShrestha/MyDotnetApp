@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sample.Data;
 
@@ -11,9 +12,11 @@ using Sample.Data;
 namespace Sample.Data.Migrations
 {
     [DbContext(typeof(RoutingDbContext))]
-    partial class RoutingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250925073545_clientDetailsUpdate")]
+    partial class clientDetailsUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,40 +24,6 @@ namespace Sample.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Sample.Data.RoutingDB.Branch", b =>
-                {
-                    b.Property<int>("SN")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SN"));
-
-                    b.Property<bool?>("IsTimeEnforced")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEng")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeSpan?>("OfficeCloseTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan?>("OfficeOpenTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SN");
-
-                    b.ToTable("tblBranch");
-                });
 
             modelBuilder.Entity("Sample.Data.RoutingDB.Logo", b =>
                 {
@@ -162,6 +131,7 @@ namespace Sample.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("client_id"));
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ApprovalSystem")
@@ -174,24 +144,28 @@ namespace Sample.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Owner")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Primary_email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Primary_phone")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Primary_phone")
+                        .HasColumnType("int");
 
                     b.Property<bool>("SMS_service")
                         .HasColumnType("bit");
 
                     b.Property<string>("Secondary_email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Secondary_phone")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Secondary_phone")
+                        .HasColumnType("int");
 
                     b.Property<string>("client_name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("created_by")
@@ -201,6 +175,7 @@ namespace Sample.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("db_name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("modified_by")

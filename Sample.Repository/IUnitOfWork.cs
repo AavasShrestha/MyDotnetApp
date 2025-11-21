@@ -13,6 +13,7 @@ namespace Sample.Repository
         IRepository<Logo> LogoRepository { get; }
         RoutingDbContext DbContext { get; }
         IRepository<RegisterDb> RegisterDbRepository { get; }
+        
 
         bool Commit();
 

@@ -1,7 +1,12 @@
+
 ﻿using Sample.Data.DTO;
 using Sample.Service;
 using Microsoft.AspNetCore.Mvc;
 using Azure;
+
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace Sample.API.Controllers
 {
@@ -9,6 +14,7 @@ namespace Sample.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+
         private readonly IUserService _userService;
 
         public UserController(IUserService userService)

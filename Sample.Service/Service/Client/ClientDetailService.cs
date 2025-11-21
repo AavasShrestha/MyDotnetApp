@@ -36,8 +36,18 @@ namespace Sample.Service.Service.Client
                     return response;
                 }
 
-                var clientName = (clientDetailDto.client_name ?? string.Empty).Trim();
-                var dbName = (clientDetailDto.db_name ?? string.Empty).Trim();
+                var clientName = clientDetailDto.client_name;
+                var dbName = clientDetailDto.db_name;
+                var Owner = clientDetailDto.Owner;
+                var Address = clientDetailDto.Address;
+                var Primary_email = clientDetailDto.Primary_email;
+                var Secondary_email = clientDetailDto.Secondary_email;
+                var Primary_phone = clientDetailDto.Primary_phone;
+                var Secondary_phone = clientDetailDto.Secondary_phone;
+                var SMS_service = clientDetailDto.SMS_service;
+                var ApprovalSystem = clientDetailDto.ApprovalSystem;
+                var CollectionApp = clientDetailDto.CollectionApp;
+               
 
                 if (string.IsNullOrWhiteSpace(clientName))
                 {
@@ -50,7 +60,29 @@ namespace Sample.Service.Service.Client
                     response.Message = "Database name cannot be null or empty.";
                     return response;
                 }
-                    
+                if (string.IsNullOrWhiteSpace(Owner))
+                {
+                    response.Message = "Owner name cannot be null or empty.";
+                    return response;
+                }
+                if (string.IsNullOrWhiteSpace(Address))
+                {
+                    response.Message = "Address name cannot be null or empty.";
+                    return response;
+                }
+                if (string.IsNullOrWhiteSpace(Primary_email))
+                {
+                    response.Message = "Primary_email name cannot be null or empty.";
+                    return response;
+                }
+              
+                if (string.IsNullOrWhiteSpace(Primary_phone))
+                {
+                    response.Message = "Primary_phone name cannot be null or empty.";
+                    return response;
+                }
+              
+
 
                 var exists = _unitOfWork.ClientDetailsRepository.GetQuerable(c => c.client_name == clientName && c.db_name == dbName).Any();
 
@@ -60,9 +92,8 @@ namespace Sample.Service.Service.Client
                     return response;
                 }
 
+                //  Validate database exists
                 var allowedDatabases = _databaseService.GetAllDatabases();
-
-                //  Validate database exists**
                 if (!allowedDatabases.Contains(dbName))
                 {
                     response.Message = $"The database '{dbName}' does not exist or is not allowed.";
@@ -70,37 +101,29 @@ namespace Sample.Service.Service.Client
                 }
 
                 //Logo Image Handling start
-                if (clientDetailDto.logo == null || clientDetailDto.logo.Length == 0)
+
+                if (clientDetailDto.logo != null)
                 {
-                    response.IsSuccess = false;
-                    response.Message = "Invalid file";
-                    return response;
+
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "logos", clientDetailDto.db_name);
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var newFileName = $"{clientDetailDto.logo.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, newFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        clientDetailDto.logo.CopyTo(stream);
+                    }
+
+                   
                 }
 
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "logos", clientDetailDto.db_name);
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var newFileName = $"{clientDetailDto.logo.FileName}";
-                var filePath = Path.Combine(uploadsFolder, newFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    clientDetailDto.logo.CopyTo(stream);
-                }
-
-                //var baseUrl = GetBaseUrl();
-                
-                var logoName = clientDetailDto.logo.FileName;
-
-                // Combine virtual URL path for public access
-                var logoUrl = Path.Combine("uploads", "logos", logoName).Replace("\\", "/");
 
                 //Logo Image Handling end
-
-
                 var entity = new tblClientDetails
                 {
                     client_name = clientName,
@@ -109,7 +132,16 @@ namespace Sample.Service.Service.Client
                     created_by = userID,
                     modified_date = DateTime.UtcNow,
                     modified_by = userID,
-                    Logo = logoUrl
+                    //Logo = clientDetailDto.logo.FileName,
+                    Owner =  Owner,
+                    Address = Address,
+                    Primary_phone = clientDetailDto.Primary_phone,
+                    Secondary_phone = clientDetailDto.Secondary_phone,
+                    Primary_email = Primary_email,
+                    Secondary_email = Secondary_email,
+                    SMS_service = SMS_service,
+                    ApprovalSystem = ApprovalSystem,
+                    CollectionApp = CollectionApp
                 };
 
                 _unitOfWork.ClientDetailsRepository.Add(entity);
@@ -137,6 +169,7 @@ namespace Sample.Service.Service.Client
         public ValidationDTO UpdateClient(int userID, int id, ClientDetailDto clientDetailDto)
         {
             var response = new ValidationDTO();
+
 
             try
             {
@@ -166,6 +199,17 @@ namespace Sample.Service.Service.Client
                 //  Update only allowed fields
                 entity.client_name = (clientDetailDto.client_name ?? string.Empty).Trim();
                 entity.db_name = (clientDetailDto.db_name ?? string.Empty).Trim();
+                entity.Logo = (clientDetailDto.Logo ?? string.Empty).Trim();
+                entity.Owner = clientDetailDto.Owner;
+                entity.Address = (clientDetailDto.Address);
+                entity.Primary_email = (clientDetailDto.Primary_email);
+                entity.Secondary_email = (clientDetailDto.Secondary_email);
+                entity.Primary_phone = (clientDetailDto.Primary_phone);
+                entity.Secondary_phone = (clientDetailDto.Secondary_phone);
+                entity.ApprovalSystem = (clientDetailDto.ApprovalSystem);
+                entity.SMS_service = (clientDetailDto.SMS_service);
+                entity.CollectionApp = (clientDetailDto.CollectionApp);
+
 
                 //Set audit fields
                 entity.modified_date = DateTime.UtcNow;
@@ -194,13 +238,19 @@ namespace Sample.Service.Service.Client
                 if (id <= 0)
                     throw new ArgumentException("Invalid client id.");
 
+                
                 //  Find existing client
                 var entity = _unitOfWork.ClientDetailsRepository
                     .GetQuerable(c => c.client_id == id)
                     .FirstOrDefault();
 
                 if (entity == null)
-                    throw new KeyNotFoundException("Client not found.");
+                {
+                    response.IsSuccess = false;
+                    response.Message = $"Client with id = {id} not found.";
+                    return response;
+                }
+                    
 
                 //  Delete the client
                 _unitOfWork.ClientDetailsRepository.Delete(entity);
@@ -238,7 +288,18 @@ namespace Sample.Service.Service.Client
                 created_by = c.created_by,
                 modified_date = c.modified_date,
                 modified_by = c.modified_by,
-                Logo = String.IsNullOrEmpty(c.Logo) ? null : Path.Combine(baseUrl, c.Logo)
+                Logo = String.IsNullOrEmpty(c.Logo) ? null : $"{baseUrl}/api/ClientDetail/image/{c.client_id}/{c.Logo}",
+                Owner = c.Owner,
+                Address = c.Address,
+                Primary_phone = c.Primary_phone,
+                Secondary_phone = c.Secondary_phone,
+                Primary_email = c.Primary_email,
+                Secondary_email = c.Secondary_email,
+                SMS_service = c.SMS_service,
+                ApprovalSystem = c.ApprovalSystem,
+                CollectionApp = c.CollectionApp
+
+
             }).ToList();
 
             //  Return the list of DTOs
@@ -247,14 +308,13 @@ namespace Sample.Service.Service.Client
 
         public ClientDetailDto GetClientById(int id)
         {
-            //  Validate the id
             if (id <= 0)
                 throw new ArgumentException("Invalid client id.");
 
             //  Fetch the client entity from the database
             var client = _unitOfWork.ClientDetailsRepository.GetQuerable(c => c.client_id == id).FirstOrDefault();
+            var baseUrl = GetBaseUrl();
 
-            //  If no client found, return null
             if (client == null)
                 return null;
 
@@ -267,7 +327,19 @@ namespace Sample.Service.Service.Client
                 created_date = client.created_date,
                 created_by = client.created_by,
                 modified_date = client.modified_date,
-                modified_by = client.modified_by
+                modified_by = client.modified_by,
+                Logo = String.IsNullOrEmpty(client.Logo) ? null : $"{baseUrl}/api/ClientDetail/image/{client.client_id}/{client.Logo}",
+                Owner = client.Owner,
+                Address = client.Address,
+                Primary_phone = client.Primary_phone,
+                Secondary_phone = client.Secondary_phone,
+                Primary_email = client.Primary_email,
+                Secondary_email = client.Secondary_email,
+                SMS_service = client.SMS_service,
+                ApprovalSystem = client.ApprovalSystem,
+                CollectionApp = client.CollectionApp
+
+                //Logo = String.IsNullOrEmpty(client.Logo) ? null :Path.Combine(baseUrl, client.Logo)
             };
 
             //  Return the DTO
@@ -293,6 +365,7 @@ namespace Sample.Service.Service.Client
 
         public ClientDetailDto PatchClient(int userID, int id, Dictionary<string, object> updates)
         {
+
             if (updates == null || updates.Count == 0)
                 throw new ArgumentException("No fields provided for update.");
 
@@ -306,12 +379,63 @@ namespace Sample.Service.Service.Client
                     case "client_name":
                         entity.client_name = kvp.Value?.ToString()?.Trim();
                         break;
+
                     case "db_name":
                         entity.db_name = kvp.Value?.ToString()?.Trim();
                         break;
+
                     case "modified_by":
                         if (kvp.Value != null && int.TryParse(kvp.Value.ToString(), out int modBy))
                             entity.modified_by = modBy;
+                        break;
+
+                    case "logo":
+                        entity.Logo = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "owner":
+                        entity.Owner = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "address":
+                        entity.Address = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "primary_phone":
+                        entity.Primary_phone = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "secondary_phone":
+                        entity.Secondary_phone = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "primary_email":
+                        entity.Primary_email = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "secondary_email":
+                        entity.Secondary_email = kvp.Value?.ToString()?.Trim();
+                        break;
+
+                    case "sms_service":
+                        if (kvp.Value != null && bool.TryParse(kvp.Value.ToString(), out bool sms))
+                        {
+                            entity.SMS_service = sms;
+                        }
+                        break;
+
+                    case "approvalsystem":
+                        if (kvp.Value != null && bool.TryParse(kvp.Value.ToString(), out bool ApprovalSystem))
+                        {
+                            entity.ApprovalSystem = ApprovalSystem;
+                        }
+                        break;
+
+                    case "collectionapp":
+                        if (kvp.Value != null && bool.TryParse(kvp.Value.ToString(), out bool CollectionApp))
+                        {
+                            entity.CollectionApp = CollectionApp;
+                        }
                         break;
                 }
             }
