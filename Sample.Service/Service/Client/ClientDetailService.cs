@@ -47,7 +47,8 @@ namespace Sample.Service.Service.Client
                 var SMS_service = clientDetailDto.SMS_service;
                 var ApprovalSystem = clientDetailDto.ApprovalSystem;
                 var CollectionApp = clientDetailDto.CollectionApp;
-               
+                var CID = clientDetailDto.CID;
+
 
                 if (string.IsNullOrWhiteSpace(clientName))
                 {
@@ -209,6 +210,7 @@ namespace Sample.Service.Service.Client
                 entity.ApprovalSystem = (clientDetailDto.ApprovalSystem);
                 entity.SMS_service = (clientDetailDto.SMS_service);
                 entity.CollectionApp = (clientDetailDto.CollectionApp);
+                entity.CID = (clientDetailDto.CID);
 
 
                 //Set audit fields
@@ -297,7 +299,8 @@ namespace Sample.Service.Service.Client
                 Secondary_email = c.Secondary_email,
                 SMS_service = c.SMS_service,
                 ApprovalSystem = c.ApprovalSystem,
-                CollectionApp = c.CollectionApp
+                CollectionApp = c.CollectionApp,
+                CID = c.CID,
 
 
             }).ToList();
@@ -337,7 +340,8 @@ namespace Sample.Service.Service.Client
                 Secondary_email = client.Secondary_email,
                 SMS_service = client.SMS_service,
                 ApprovalSystem = client.ApprovalSystem,
-                CollectionApp = client.CollectionApp
+                CollectionApp = client.CollectionApp,
+                CID = client.CID,
 
                 //Logo = String.IsNullOrEmpty(client.Logo) ? null :Path.Combine(baseUrl, client.Logo)
             };

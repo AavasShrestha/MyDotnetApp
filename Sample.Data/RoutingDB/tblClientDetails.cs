@@ -38,6 +38,8 @@ namespace Sample.Data.RoutingDB
         public DateTime modified_date { get; set; }
         public string? Logo { get; set; }
 
+        public bool CID { get; set; }
+
         //public string db_username { get; set; }
         //public string db_pwd { get; set; }
         //public string server_name { get; set; }

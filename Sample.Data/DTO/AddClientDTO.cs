@@ -28,6 +28,7 @@ namespace Sample.Data.DTO
         public bool SMS_service { get; set; } = false;
         public bool ApprovalSystem { get; set; } = false;
         public bool CollectionApp { get; set; } = false;
+        public bool CID { get; set; }
 
     }
 }

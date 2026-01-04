@@ -1,23 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Sample.Data
 {
-    public interface ITenantDbContextFactory
+    public class TenantDbContextDesignFactory
+        : IDesignTimeDbContextFactory<TenantDbContext>
     {
-        TenantDbContext Create(string connectionString);
-    }
-
-    public class TenantDbContextFactory : ITenantDbContextFactory
-    {
-        public TenantDbContext Create(string connectionString)
+        public TenantDbContext CreateDbContext(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
             var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
-            optionsBuilder.UseSqlServer(connectionString);
+
+            optionsBuilder.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"));
+
             return new TenantDbContext(optionsBuilder.Options);
         }
     }

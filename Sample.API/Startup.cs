@@ -49,8 +49,10 @@ namespace Sample.API
                 {
                     builder.WithOrigins(
                         "http://localhost:5173",
-                        "https://localhost:5173",
+                        "https://localhost:5114",
                         "http://localhost:5174",
+                        "https://sample-frontend-latest.onrender.com/login",
+                        "https://sample-frontend-latest.onrender.com",
                         "http://localhost:5175") // Include the production URL
                            .AllowAnyMethod() // Allow all HTTP methods
                            .AllowAnyHeader() // Allow all headers

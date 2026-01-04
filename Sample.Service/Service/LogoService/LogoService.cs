@@ -130,6 +130,7 @@ namespace Sample.Service.Service.LogoService
             return response;
         }
 
+
         public ValidationDTO UploadLogo(IFormFile file)
         {
 

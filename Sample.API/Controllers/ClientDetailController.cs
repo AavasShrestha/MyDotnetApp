@@ -3,24 +3,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sample.Data.DTO;
 using Sample.Data.RoutingDB;
+using Sample.Repository;
 using Sample.Service.Service.Client;
 
 namespace Sample.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ClientDetailController : ControllerBase
     {
         private readonly IClientDetailService _service;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _env;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ClientDetailController(IClientDetailService service, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment env)
+        public ClientDetailController(IClientDetailService service, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment env, IUnitOfWork unitOfWork)
         {
             _service = service;
             _httpContextAccessor = httpContextAccessor;
             _env = env;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -76,7 +79,7 @@ namespace Sample.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateClient([FromHeader(Name = "User-ID")] int userID ,[FromForm] AddClientDTO clientDetailDto)
+        public IActionResult CreateClient([FromHeader(Name = "User-ID")] int userID, [FromForm] AddClientDTO clientDetailDto)
         {
             try
             {
@@ -151,7 +154,8 @@ namespace Sample.API.Controllers
             }
         }
 
-        
+
+
 
         [HttpGet("image/{id}/{fileName}")]
         public IActionResult GetImage(int id, string fileName)
