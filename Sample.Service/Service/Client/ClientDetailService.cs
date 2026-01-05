@@ -48,6 +48,9 @@ namespace Sample.Service.Service.Client
                 var ApprovalSystem = clientDetailDto.ApprovalSystem;
                 var CollectionApp = clientDetailDto.CollectionApp;
                 var CID = clientDetailDto.CID;
+                var db_username = clientDetailDto.db_username;
+                var db_pwd = clientDetailDto.db_pwd;
+                var server_name = clientDetailDto.server_name;
 
 
                 if (string.IsNullOrWhiteSpace(clientName))
@@ -142,7 +145,14 @@ namespace Sample.Service.Service.Client
                     Secondary_email = Secondary_email,
                     SMS_service = SMS_service,
                     ApprovalSystem = ApprovalSystem,
-                    CollectionApp = CollectionApp
+                    CollectionApp = CollectionApp,
+                    
+                    // Added Later
+                    db_username = db_username,
+                    db_pwd = db_pwd,
+                    server_name = server_name,
+                    CID = CID,
+
                 };
 
                 _unitOfWork.ClientDetailsRepository.Add(entity);
@@ -211,6 +221,9 @@ namespace Sample.Service.Service.Client
                 entity.SMS_service = (clientDetailDto.SMS_service);
                 entity.CollectionApp = (clientDetailDto.CollectionApp);
                 entity.CID = (clientDetailDto.CID);
+                entity.db_username = (clientDetailDto.db_username);
+                entity.db_pwd = (clientDetailDto.db_pwd);
+                entity.server_name = (clientDetailDto.server_name);
 
 
                 //Set audit fields
@@ -301,6 +314,9 @@ namespace Sample.Service.Service.Client
                 ApprovalSystem = c.ApprovalSystem,
                 CollectionApp = c.CollectionApp,
                 CID = c.CID,
+                db_username = c.db_username,
+                db_pwd = c.db_pwd,
+                server_name = c.server_name,
 
 
             }).ToList();
@@ -342,6 +358,9 @@ namespace Sample.Service.Service.Client
                 ApprovalSystem = client.ApprovalSystem,
                 CollectionApp = client.CollectionApp,
                 CID = client.CID,
+                db_username = client.db_username,
+                db_pwd = client.db_pwd,
+                server_name = client.server_name,
 
                 //Logo = String.IsNullOrEmpty(client.Logo) ? null :Path.Combine(baseUrl, client.Logo)
             };

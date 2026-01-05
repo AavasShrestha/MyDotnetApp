@@ -40,9 +40,9 @@ namespace Sample.Data.RoutingDB
 
         public bool CID { get; set; }
 
-        //public string db_username { get; set; }
-        //public string db_pwd { get; set; }
-        //public string server_name { get; set; }
+        public string? db_username { get; set; }
+        public string? db_pwd { get; set; }
+        public string? server_name { get; set; }
         //public int CID { get; set; }
     }
 }
