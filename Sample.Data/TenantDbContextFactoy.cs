@@ -5,8 +5,7 @@ using System.IO;
 
 namespace Sample.Data
 {
-    public class TenantDbContextDesignFactory
-        : IDesignTimeDbContextFactory<TenantDbContext>
+    public class TenantDbContextDesignFactory : IDesignTimeDbContextFactory<TenantDbContext>
     {
         public TenantDbContext CreateDbContext(string[] args)
         {

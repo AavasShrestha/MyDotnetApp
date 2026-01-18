@@ -13,8 +13,10 @@ using Sample.Service.Database;
 using Sample.Service.Service.Client;
 using Sample.Service.Service.LogoService;
 using Sample.Service.Service.RegisterDbService;
-using Sample.Service.Service.BranchService;
 using Sample.Data.RoutingDB;
+using Sample.Data.KamanaDB;
+using Sample.Repository.Kamana;
+using Sample.Service.Kamana;
 namespace Sample.API
 {
     public class Startup
@@ -32,7 +34,13 @@ namespace Sample.API
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddEntityFrameworkSqlServer().AddDbContextPool<RoutingDbContext>(b => b.UseSqlServer(connectionString));
 
-            
+
+            //for KamanaDB
+            var kamanaConnection = Configuration.GetConnectionString("KamanaConnection");
+
+            services.AddDbContext<KamanaDbContext>(options =>
+                options.UseSqlServer(kamanaConnection));
+
 
             services.AddHttpContextAccessor();
             services.AddMvc(setupAction =>
@@ -239,7 +247,12 @@ namespace Sample.API
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<ILogoService, LogoService>();
             services.AddScoped<IRegisterDbService, RegisterDbService>();
-            services.AddScoped<IBranchService, BranchService>();
+
+            //for Kamana
+            services.AddScoped<IKamanaUnitOfWork, KamanaUnitOfWork>();
+            services.AddScoped<IAppMenuService, AppMenuService>();
+
+
             // tbl_user and tbl_branch
             //services.AddScoped<IBranchService, BranchService>();
             //services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();

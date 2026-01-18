@@ -10,7 +10,6 @@ namespace Sample.Data
         public DbSet<User> User { get; set; }
         public DbSet<Logo> Logo { get; set; }
         public DbSet<RegisterDb> RegisterDb { get; set; }
-        public DbSet<Branch> tblBranch { get; set; }
         public RoutingDbContext(DbContextOptions<RoutingDbContext> options) : base(options)
         {
         }
