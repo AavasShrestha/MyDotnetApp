@@ -44,5 +44,7 @@ namespace Sample.Data.RoutingDB
         public string? db_pwd { get; set; }
         public string? server_name { get; set; }
         //public int CID { get; set; }
+        public bool isActive { get; set; }
+
     }
 }

@@ -51,7 +51,7 @@ namespace Sample.Service.Service.Client
                 var db_username = clientDetailDto.db_username;
                 var db_pwd = clientDetailDto.db_pwd;
                 var server_name = clientDetailDto.server_name;
-
+                var isActive = clientDetailDto.isActive;
 
                 if (string.IsNullOrWhiteSpace(clientName))
                 {
@@ -152,6 +152,7 @@ namespace Sample.Service.Service.Client
                     db_pwd = db_pwd,
                     server_name = server_name,
                     CID = CID,
+                    isActive = isActive
 
                 };
 
@@ -224,7 +225,7 @@ namespace Sample.Service.Service.Client
                 entity.db_username = (clientDetailDto.db_username);
                 entity.db_pwd = (clientDetailDto.db_pwd);
                 entity.server_name = (clientDetailDto.server_name);
-
+                entity.isActive = (clientDetailDto.isActive);
 
                 //Set audit fields
                 entity.modified_date = DateTime.UtcNow;
@@ -317,7 +318,7 @@ namespace Sample.Service.Service.Client
                 db_username = c.db_username,
                 db_pwd = c.db_pwd,
                 server_name = c.server_name,
-
+                isActive = c.isActive
 
             }).ToList();
 
@@ -361,7 +362,7 @@ namespace Sample.Service.Service.Client
                 db_username = client.db_username,
                 db_pwd = client.db_pwd,
                 server_name = client.server_name,
-
+                isActive = client.isActive
                 //Logo = String.IsNullOrEmpty(client.Logo) ? null :Path.Combine(baseUrl, client.Logo)
             };
 

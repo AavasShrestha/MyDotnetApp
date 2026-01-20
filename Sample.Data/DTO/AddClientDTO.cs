@@ -33,5 +33,6 @@ namespace Sample.Data.DTO
         public string? db_pwd { get; set; }
         public string? server_name { get; set; }
 
+        public  bool isActive { get; set; }
     }
 }

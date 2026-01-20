@@ -17,6 +17,7 @@ using Sample.Data.RoutingDB;
 using Sample.Data.KamanaDB;
 using Sample.Repository.Kamana;
 using Sample.Service.Kamana;
+using Sample.Service.Service.Tenant;
 namespace Sample.API
 {
     public class Startup
@@ -33,6 +34,11 @@ namespace Sample.API
             services.AddEndpointsApiExplorer();
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddEntityFrameworkSqlServer().AddDbContextPool<RoutingDbContext>(b => b.UseSqlServer(connectionString));
+
+            // Master database (RoutingDb / Tenant metadata)
+            var masterConnection = Configuration.GetConnectionString("DefaultConnection"); // RoutingDb
+            services.AddDbContext<MasterDbContext>(options =>
+                options.UseSqlServer(masterConnection));
 
 
             //for KamanaDB
@@ -252,6 +258,11 @@ namespace Sample.API
             services.AddScoped<IKamanaUnitOfWork, KamanaUnitOfWork>();
             services.AddScoped<IAppMenuService, AppMenuService>();
 
+            // Tenant connection provider
+            services.AddScoped<ITenantConnectionProvider, TenantConnectionProvider>();
+
+            // Tenant service to query tenant DBs
+            services.AddScoped<TenantService>();
 
             // tbl_user and tbl_branch
             //services.AddScoped<IBranchService, BranchService>();
